@@ -46,15 +46,7 @@ read_data_set <- function(file_info, feature_codes, activity_codes){
         activity_info = read.table(file_info$activity_info, col.names='index')
         activity_info = merge(activity_info, activity_codes, by='index')
         records$activity = activity_info$activity
-        data_type = factor(rep(file_info$type, nrow(records)), 
-                            levels = c("train", "test"))
-        records$data_type = data_type
         return(records)
-}
-
-calculate_summary <- function(dt) {
-        summary_avg = ddply(dt, c("subject_id", "activity"), numcolwise(mean))
-        write.table(summary_avg, 'accelerometer_groupwise_avg.txt', row.name=FALSE)
 }
 
 analyze <- function(dir) {
@@ -67,8 +59,8 @@ analyze <- function(dir) {
         print('Processing test data set')        
         test_data_set = read_data_set(file_info, feature_codes, activity_codes)        
         data_set = rbind(train_data_set, test_data_set)
-        write.table(data_set, 'accelerometer_mean_std.txt', row.name=FALSE)
-        calculate_summary(data_set)
+        summary_avg = ddply(data_set, c("subject_id", "activity"), numcolwise(mean))
+        write.table(summary_avg, 'accelerometer_groupwise_avg.txt', row.name=FALSE)
 }
 
 analyze(getwd())
