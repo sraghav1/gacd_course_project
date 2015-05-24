@@ -27,16 +27,17 @@ get_activity_codes <- function(file){
         df = read.table(file, col.names = c('index', 'activity'))
 }
 
-get_desired_cols <- function(feature_codes) {
-        mean_std_cols = grep('.*(-mean\\(|-std\\().*', feature_codes$feature)
-        colnames = feature_codes[mean_std_cols,]$feature
+get_desired_cols <- function(colnames) {
+        mean_std_cols = grep('.*\\.mean\\.|\\.std\\..*', colnames)
+        colnames = colnames[mean_std_cols]
 }
 
 read_data_set <- function(file_info, feature_codes, activity_codes){
-        print('Reading feature info')                        
+        print('Reading feature info')      
+        colnames = make.names(feature_codes$feature)
         records = read.table(file_info$features, 
                              col.names=feature_codes$feature)  
-        desired_cols = get_desired_cols(feature_codes)
+        desired_cols = get_desired_cols(colnames)
         records = subset(records, select=desired_cols)
         print('Reading subject information')        
         subject_info = factor(read.table(file_info$subject_info)$V1, levels=c(1:30))
